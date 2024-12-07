@@ -11,10 +11,26 @@ class GuestInline(admin.StackedInline):
 
 
 class GuestGroupAdmin(admin.ModelAdmin):
-    fields = ['email']
+    fields = ['name', 'email']
     inlines = [GuestInline]
+    search_fields = ['name', 'guests__name']
+    list_display = ['name', 'status', 'updated_at']
+    list_filter = ['updated_at', 'status']
 
 
-admin.site.register(Guest)
+class GuestAdmin(admin.ModelAdmin):
+    search_fields = ['name', 'group__name']
+    list_filter = ['status']
+    list_display = ['name', 'group__name', 'status', 'has_dietary_restriction']
+
+
+class GuestGroupEmailInvitationAdmin(admin.ModelAdmin):
+    fields = ['group', 'expires_at']
+    list_filter = ['slug', 'group__name']
+    list_display = ['group__name', 'slug', 'expires_at']
+    list_filter = ['expires_at']
+
+
+admin.site.register(Guest, GuestAdmin)
 admin.site.register(GuestGroup, GuestGroupAdmin)
-admin.site.register(GuestGroupEmailInvitation)
+admin.site.register(GuestGroupEmailInvitation, GuestGroupEmailInvitationAdmin)

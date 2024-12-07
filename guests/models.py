@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from shortuuid.django_fields import ShortUUIDField
+from django.contrib import admin
 
 
 class GuestGroup(models.Model):
@@ -8,6 +9,7 @@ class GuestGroup(models.Model):
         RESPONDED = "RE", _("Responded")
         NO_RESPONSE = "NR", _("No Response")
 
+    name = models.CharField(max_length=100)
     status = models.CharField(
         max_length=2,
         choices=GuestGroupStatusOptions,
@@ -15,6 +17,9 @@ class GuestGroup(models.Model):
     )
     email = models.EmailField(unique=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.name
 
 
 class Guest(models.Model):
@@ -29,12 +34,25 @@ class Guest(models.Model):
         choices=GuestStatusOptions,
         default=GuestStatusOptions.NO_RESPONSE
     )
-    dietary_restrictions = models.TextField()
+    dietary_restrictions = models.TextField(blank=True, null=True)
     group = models.ForeignKey(
         GuestGroup,
         related_name="guests",
         on_delete=models.CASCADE
     )
+
+    @admin.display(
+        boolean=True,
+        description="Has a Dietary Restriction?",
+    )
+    def has_dietary_restriction(self):
+        return (
+            self.dietary_restrictions is not None
+            and len(self.dietary_restrictions) > 0
+        )
+
+    def __str__(self):
+        return self.name
 
 
 class GuestGroupEmailInvitation(models.Model):
@@ -52,3 +70,6 @@ class GuestGroupEmailInvitation(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     expires_at = models.DateTimeField()
+
+    def __str__(self):
+        return self.group.name + " - " + self.slug
