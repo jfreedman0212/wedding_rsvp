@@ -1,0 +1,14 @@
+<form method="post">
+    {% csrf_token %}
+    {{ form.management_form }}  {# Required for formsets #}
+
+    {% for guest_form in form %}
+        <div class="guest-form">
+            <h3>Guest {{ guest_form.name.initial }}</h3>
+            {{ guest_form.as_p }}
+        </div>
+    {% endfor %}
+
+    <button type="submit">Save</button>
+</form>
+

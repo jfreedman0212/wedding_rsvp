@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import GuestGroup, Guest
+from .models import GuestGroupEmailInvitation, GuestGroup, Guest
 
 
 class GuestInline(admin.StackedInline):
@@ -17,3 +17,4 @@ class GuestGroupAdmin(admin.ModelAdmin):
 
 admin.site.register(Guest)
 admin.site.register(GuestGroup, GuestGroupAdmin)
+admin.site.register(GuestGroupEmailInvitation)

@@ -13,14 +13,8 @@ class GuestGroup(models.Model):
         choices=GuestGroupStatusOptions,
         default=GuestGroupStatusOptions.NO_RESPONSE
     )
-    slug = ShortUUIDField(
-        length=10,
-        max_length=10,
-        alphabet='abcdefghjkmnprstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789',
-        primary_key=False,
-        unique=True
-    )
     email = models.EmailField(unique=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
 
 class Guest(models.Model):
@@ -41,3 +35,20 @@ class Guest(models.Model):
         related_name="guests",
         on_delete=models.CASCADE
     )
+
+
+class GuestGroupEmailInvitation(models.Model):
+    slug = ShortUUIDField(
+        length=10,
+        max_length=10,
+        alphabet='abcdefghjkmnprstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789',
+        primary_key=False,
+        unique=True
+    )
+    group = models.ForeignKey(
+        GuestGroup,
+        related_name='invitations',
+        on_delete=models.DO_NOTHING
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
