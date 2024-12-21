@@ -10,12 +10,18 @@ class GuestInline(admin.StackedInline):
     fields = ['name']
 
 
+@admin.action(description='Send email invitations to selected')
+def send_emails_for_selected(modeladmin, request, queryset):
+    pass
+
+
 class GuestGroupAdmin(admin.ModelAdmin):
     fields = ['name', 'email']
     inlines = [GuestInline]
     search_fields = ['name', 'guests__name']
     list_display = ['name', 'status', 'updated_at']
     list_filter = ['updated_at', 'status']
+    actions = [send_emails_for_selected]
 
 
 class GuestAdmin(admin.ModelAdmin):

@@ -13,6 +13,8 @@ class RsvpRequestForm(forms.Form):
             group = models.GuestGroup.objects.get(
                 email=self.cleaned_data['email']
             )
+            active_invitations = group.invitations.filter(
+                expires_at__gt=timezone.now()).latest('expires_at')
             models.GuestGroupEmailInvitation.objects.filter(
                 group=group
             ).delete()
