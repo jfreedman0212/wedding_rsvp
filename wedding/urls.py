@@ -17,10 +17,25 @@ Including another URLconf
 from django.contrib import admin
 from django.contrib.flatpages import views
 from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
 
+# statically configured routes. configure these first
 urlpatterns = [
     path('rsvp/', include('guests.urls')),
     path('admin/', admin.site.urls),
+]
+# serve user-uploaded media files during development.
+# in production, these will be served by S3 (or some other file storage).
+# The static function itself checking settings.DEBUG
++ static(
+    settings.MEDIA_URL,
+    document_root=settings.MEDIA_ROOT
+)
+
+# flatpage urls for the customizable homepage and any other page too
+urlpatterns += [
     path('', views.flatpage, {'url': '/'}, name='home'),
-    path('<path:url>', views.flatpage, name='flatpages')
+    path('<path:url>', views.flatpage, name='flatpages'),
+
 ]

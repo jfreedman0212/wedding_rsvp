@@ -11,7 +11,11 @@ package-mode = false
 python = "^3.13"
 django = "^5.1.4"
 shortuuid = "^1.0.13"
+django-filer = "^3.3.1"
 
+
+[tool.poetry.group.dev.dependencies]
+setuptools = "^75.6.0"
 
 [build-system]
 requires = ["poetry-core"]
