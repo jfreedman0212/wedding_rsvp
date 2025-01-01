@@ -38,7 +38,7 @@ if len(find_dotenv(DOTENV_PATH)) > 0:
 
 SECRET_KEY = get_required_env('SECURITY_KEY')
 
-DEBUG = get_optional_env('DEBUG', False)
+DEBUG = bool(get_optional_env('DEBUG', False))
 
 ALLOWED_HOSTS = []
 
