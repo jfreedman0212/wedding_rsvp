@@ -10,24 +10,36 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
-import environ
+from dotenv import load_dotenv, find_dotenv
 import os
 from pathlib import Path
 
-env = environ.Env(DEBUG=(bool, False))
+
+def get_optional_env(key, default):
+    return os.environ.get(key, default)
+
+
+def get_required_env(key):
+    if key not in os.environ:
+        # TODO: make this a better exception class!
+        raise Exception(f"Required environment variable {key} not found.")
+    return os.environ.get(key)
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+DOTENV_PATH = BASE_DIR / ".env"
 
+# only load from the .env file if there is one. otherwise, solely rely on
+# environment variables for the configuration. this allows both options.
+# primarily, we'll use .env
+if len(find_dotenv(DOTENV_PATH)) > 0:
+    load_dotenv(DOTENV_PATH)
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
+SECRET_KEY = get_required_env('SECURITY_KEY')
 
-SECRET_KEY = env('SECURITY_KEY')
-
-DEBUG = env('DEBUG')
+DEBUG = get_optional_env('DEBUG', False)
 
 ALLOWED_HOSTS = []
 
@@ -84,8 +96,22 @@ WSGI_APPLICATION = 'wedding.wsgi.application'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
-    # reads the DATABASE_URL environment variable
-    'default': env.db()
+    # Based on this article: https://blog.pecar.me/sqlite-django-config
+    'default': {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": get_required_env("SQLITE_DB_PATH"),
+        "OPTIONS": {
+            "transaction_mode": "IMMEDIATE",
+            "timeout": 5,  # seconds
+            "init_command": """
+                PRAGMA journal_mode=WAL;
+                PRAGMA synchronous=NORMAL;
+                PRAGMA mmap_size = 134217728;
+                PRAGMA journal_size_limit = 27103364;
+                PRAGMA cache_size=2000;
+            """,
+        }
+    }
 }
 
 
