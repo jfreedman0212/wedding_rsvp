@@ -15,14 +15,13 @@ import os
 from pathlib import Path
 
 
-def get_optional_env(key, default):
+def get_optional_env(key, default=None):
     return os.environ.get(key, default)
 
 
 def get_required_env(key):
     if key not in os.environ:
-        # TODO: make this a better exception class!
-        raise Exception(f"Required environment variable {key} not found.")
+        raise KeyError(f"Required environment variable {key} not found.")
     return os.environ.get(key)
 
 
@@ -42,6 +41,10 @@ SECRET_KEY = get_required_env('SECURITY_KEY')
 DEBUG = get_optional_env('DEBUG', False)
 
 ALLOWED_HOSTS = []
+
+hostname = get_optional_env('HOSTNAME')
+if hostname is not None and len(hostname) > 0:
+    ALLOWED_HOSTS += [hostname]
 
 SITE_ID = 1
 
